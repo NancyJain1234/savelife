@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+   form {
+    max-width: 1000px;
+    margin: auto;
+}
+
+form label {
+    display: block;
+    margin-top: 12px;
+    font-weight: bold;
+}
+
+form input,
+form select,
+form button {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+form p {
+    margin: 0;
+    font-size: 13px;
+}
+
+form button {
+    background-color: #d9534f;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: #c9302c;
+}
+ 
+</style>
+
+<h2>Register as a Donor</h2>
+
+{% if success %}
+<div style="
+    background-color: #e6ffe6;
+    color: #2d862d;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    text-align: center;
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 20px;
+">
+    ✔ Registration successful!
+</div>
+{% endif %}
+
+<form method="POST" onsubmit="return validateForm()">
+    <input type="text" name="name" placeholder="Full Name" required>
+
+    <label for="dob">Date of Birth:</label>
+    <input type="date" id="dob" name="dob" onchange="calculateAge()" required>
+
+    <input type="number" name="age" id="age" placeholder="Age" readonly required>
+
+    <label for="gender">Gender:</label>
+    <select name="gender" id="gender" required>
+        <option value="">--Select--</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Others">Others</option>
+    </select>
+
+    <label for="blood_group">Blood Group:</label>
+    <select name="blood_group" id="blood_group" required>
+        <option value="">--Select--</option>
+        <option value="A+">A+</option>
+        <option value="A-">A-</option>
+        <option value="B+">B+</option>
+        <option value="B-">B-</option>
+        <option value="AB+">AB+</option>
+        <option value="AB-">AB-</option>
+        <option value="O+">O+</option>
+        <option value="O-">O-</option>
+    </select>
+    <p id="bg_error" style="color:red;"></p>
+
+    <input type="text" name="city" placeholder="City" required>
+    <input type="text" name="state" placeholder="State" required>
+
+    <input type="text" name="aadhar" id="aadhar" placeholder="Aadhar Number (XXXX XXXX XXXX)" maxlength="14" required>
+    <p id="aadhar_error" style="color:red;"></p>
+
+    <input type="text" name="mobile" id="mobile" placeholder="Mobile Number" maxlength="10" required>
+    <p id="mobile_error" style="color:red;"></p>
+
+
+    <input type="email" name="email" id="email" placeholder="Email Address" required>
+    <p id="email_error" style="color:red;"></p>
+    
+    <button type="submit">Register</button>
+</form>
+
+<script>
+function calculateAge() {
+    const dob = document.getElementById("dob").value;
+    if (dob) {
+        const today = new Date();
+        const birthDate = new Date(dob);
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        document.getElementById("age").value = age;
+    }
+}
+
+function validateForm() {
+    return validateBloodGroup() && validateAadhar() && validateMobile();
+}
+
+function validateBloodGroup() {
+    const bgInput = document.getElementById("blood_group").value;
+    const errorMsg = document.getElementById("bg_error");
+
+    if (bgInput === "") {
+        errorMsg.textContent = "Please select a valid blood group.";
+        return false;
+    } else {
+        errorMsg.textContent = "";
+        return true;
+    }
+}
+
+document.getElementById("aadhar").addEventListener("input", function (e) {
+    let value = e.target.value.replace(/\D/g, ""); // Remove non-digits
+    if (value.length > 12) value = value.slice(0, 12);
+
+    // Format as XXXX XXXX XXXX
+    let formatted = "";
+    for (let i = 0; i < value.length; i++) {
+        formatted += value[i];
+        if ((i + 1) % 4 === 0 && i !== value.length - 1) formatted += " ";
+    }
+    e.target.value = formatted;
+});
+
+function validateAadhar() {
+    const aadhar = document.getElementById("aadhar").value.replace(/\s/g, "");
+    const error = document.getElementById("aadhar_error");
+    if (aadhar.length !== 12 || isNaN(aadhar)) {
+        error.textContent = "Aadhar number must be exactly 12 digits.";
+        return false;
+    } else {
+        error.textContent = "";
+        return true;
+    }
+}
+
+function validateMobile() {
+    const mobile = document.getElementById("mobile").value;
+    const error = document.getElementById("mobile_error");
+    const mobileRegex = /^[6-9]\d{9}$/;
+
+    if (!mobileRegex.test(mobile)) {
+        error.textContent = "Enter a valid 10-digit mobile number.";
+        return false;
+    } else {
+        error.textContent = "";
+        return true;
+    }
+}
+function validateEmail() {
+    const email = document.getElementById("email").value;
+    const error = document.getElementById("email_error");
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+        error.textContent = "Enter a valid email address.";
+        return false;
+    } else {
+        error.textContent = "";
+        return true;
+    }
+}
+</script>
+
+{% endblock %}

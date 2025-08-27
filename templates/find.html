@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>Find a Blood Donor</h2>
+
+{% if results %}
+    <h3>Matching Donors:</h3>
+    <ul style="background-color: #fff0f0; padding: 15px 20px; border-radius: 8px; list-style-type: none;">
+        {% for donor in results %}
+            <li style="margin-bottom: 15px; line-height: 1.6;">
+                <strong>Name:</strong> {{ donor['name'] }} <br>
+                <strong>Blood Group:</strong> {{ donor['blood_group'] }} <br>
+                <strong>City:</strong> {{ donor['city'].capitalize() }} <br>
+                <strong>State:</strong> {{ donor['state'].capitalize() }} <br>
+                <strong>Contact Number:</strong> {{ donor['mobile'] }} <br>
+
+            </li>
+        {% endfor %}
+    </ul>
+
+    <!-- Pagination -->
+    <div style="margin-top: 20px;">
+        {% if page > 1 %}
+            <a href="{{ url_for('find', page=page-1, blood_group=selected_blood_group, city=selected_city, state=selected_state) }}" style="margin-right: 10px;">⬅ Previous</a>
+        {% endif %}
+        Page {{ page }} of {{ total_pages }}
+        {% if page < total_pages %}
+            <a href="{{ url_for('find', page=page+1, blood_group=selected_blood_group, city=selected_city, state=selected_state) }}" style="margin-left: 10px;">Next ➡</a>
+        {% endif %}
+    </div>
+
+{% elif form_submitted %}
+    <div class="success-box" style="
+        background-color: #e6ffe6;
+        color: #2d862d;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        text-align: center;
+        font-size: 18px;
+        font-weight: 500;
+        margin-top: 20px;
+    ">
+        ✔ Your request has been successfully submitted. Nearby donors will be notified shortly!
+    </div>
+{% endif %}
+
+<form method="POST" class="form-container">
+    <div class="form-group">
+        <label for="your_name">Your Name:</label>
+        <input type="text" id="your_name" name="your_name" placeholder="Your Name" required>
+    </div>
+
+    <div class="form-group">
+        <label for="gender">Gender:</label>
+        <select name="gender" id="gender" required>
+            <option value="">--Select--</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Others">Others</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="your_mobile">Mobile:</label>
+        <input type="text" name="your_mobile" id="your_mobile" placeholder="Your Mobile Number" maxlength="10" required>
+        <p id="mobile_error" class="error"></p>
+    </div>
+
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" placeholder="Enter your email" required>
+        <p id="email_error" class="error"></p>
+    </div>
+
+    <div class="form-group">
+        <label for="blood_group">Blood Group:</label>
+        <select name="blood_group" id="blood_group" required>
+            <option value="">--Select--</option>
+            <option value="A+">A+</option>
+            <option value="A-">A-</option>
+            <option value="B+">B+</option>
+            <option value="B-">B-</option>
+            <option value="AB+">AB+</option>
+            <option value="AB-">AB-</option>
+            <option value="O+">O+</option>
+            <option value="O-">O-</option>
+        </select>
+        <p id="bg_error" class="error"></p>
+    </div>
+
+    <div class="form-group">
+        <label for="city">City:</label>
+        <input type="text" name="city" id="city" placeholder="City" required>
+    </div>
+
+    <div class="form-group">
+        <label for="state">State:</label>
+        <input type="text" name="state" id="state" placeholder="State" required>
+    </div>
+
+    <button type="submit">Find Donor</button>
+</form>
+
+<script>
+function validateForm() {
+    return validateBloodGroup() && validateMobile() && validateEmail();
+}
+
+function validateBloodGroup() {
+    const bgInput = document.getElementById("blood_group").value;
+    const errorMsg = document.getElementById("bg_error");
+
+    if (bgInput === "") {
+        errorMsg.textContent = "Please select a valid blood group.";
+        return false;
+    } else {
+        errorMsg.textContent = "";
+        return true;
+    }
+}
+
+function validateMobile() {
+    const mobile = document.getElementById("your_mobile").value;
+    const error = document.getElementById("mobile_error");
+    const mobileRegex = /^[6-9]\d{9}$/;
+
+    if (!mobileRegex.test(mobile)) {
+        error.textContent = "Enter a valid 10-digit mobile number.";
+        return false;
+    } else {
+        error.textContent = "";
+        return true;
+    }
+}
+
+function validateEmail() {
+    const email = document.getElementById("email").value;
+    const error = document.getElementById("email_error");
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+        error.textContent = "Enter a valid email address.";
+        return false;
+    } else {
+        error.textContent = "";
+        return true;
+    }
+}
+
+document.querySelector("form").addEventListener("submit", function(e) {
+    if (!validateForm()) {
+        e.preventDefault();
+    }
+});
+
+window.addEventListener('load', () => {
+    const successBox = document.querySelector('.success-box');
+    if (successBox) {
+        successBox.style.opacity = 0;
+        successBox.style.transition = 'opacity 1s';
+        setTimeout(() => successBox.style.opacity = 1, 100);
+    }
+});
+</script>
+
+{% endblock %}

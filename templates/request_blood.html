@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Blood</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* Additional form-specific styling */
+        .form-container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 25px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #b30000;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 6px;
+            color: #333;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #b30000;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #a10000;
+        }
+        .flash-message {
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .flash-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .flash-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-message flash-{{ category }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="form-container">
+        <h1>Request Blood</h1>
+        <form method="POST">
+            <label for="blood_group">Blood Group</label>
+            <input type="text" id="blood_group" name="blood_group" placeholder="e.g. O+, AB-" required>
+
+            <label for="city">City</label>
+            <input type="text" id="city" name="city" placeholder="Enter City" required>
+
+            <label for="state">State</label>
+            <input type="text" id="state" name="state" placeholder="Enter State" required>
+
+            <label for="patient_name">Patient Name</label>
+            <input type="text" id="patient_name" name="patient_name" placeholder="Enter Patient Name" required>
+
+            <label for="patient_phone">Patient Phone</label>
+            <input type="text" id="patient_phone" name="patient_phone" placeholder="Enter Contact Number" required>
+
+            <button type="submit">Send Request</button>
+        </form>
+    </div>
+
+</body>
+</html>

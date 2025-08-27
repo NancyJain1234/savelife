@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Welcome, {{ current_user.name }}!</h2>
+    <p>Your email: {{ current_user.email }}</p>
+
+    <div class="dashboard-links">
+        <a href="{{ url_for('register') }}">Register as Donor</a>
+        <a href="{{ url_for('find') }}">Find Donor</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+</div>
+{% endblock %}
