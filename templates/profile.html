@@ -257,6 +257,7 @@
                 <p>No photo uploaded.</p>
             {% endif %}
             <form action="{{ url_for('upload_photo') }}" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                 <input type="file" name="photo" accept="image/*" required>
                 <button type="submit">Upload Photo</button>
             </form>
@@ -266,6 +267,7 @@
         <div class="profile-section">
             <h2>Personal Information</h2>
             <form action="{{ url_for('update_profile') }}" method="post">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                 <label>Full Name:</label>
                 <input type="text" name="name" value="{{ user.name or '' }}">
 
@@ -292,11 +294,13 @@
     {% if not user.is_disabled %}
         <p>Your profile is <b>Active</b>. You are visible as a donor.</p>
         <form action="{{ url_for('toggle_profile') }}" method="post">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <button type="submit">Disable Profile</button>
         </form>
     {% else %}
         <p>Your profile is <b>Inactive</b>. You are not visible as a donor.</p>
         <form action="{{ url_for('toggle_profile') }}" method="post">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <button type="submit">Enable Profile</button>
         </form>
     {% endif %}

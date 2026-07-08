@@ -1,0 +1,41 @@
+# Environment variables - contains secrets
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database files
+*.db
+*.sqbpro
+
+# Uploaded files (keep directory, ignore contents)
+static/uploads/*
+!static/uploads/.gitkeep
+
+# Temporary files
+tempCodeRunnerFile.py
+
+# Logs
+*.log

@@ -60,6 +60,7 @@ form button:hover {
 {% endif %}
 
 <form method="POST" onsubmit="return validateForm()">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
     <input type="text" name="name" placeholder="Full Name" required>
 
     <label for="dob">Date of Birth:</label>
@@ -95,12 +96,17 @@ form button:hover {
     <input type="text" name="aadhar" id="aadhar" placeholder="Aadhar Number (XXXX XXXX XXXX)" maxlength="14" required>
     <p id="aadhar_error" style="color:red;"></p>
 
-    <input type="text" name="mobile" id="mobile" placeholder="Mobile Number" maxlength="10" required>
+    <input type="text" name="phone" id="mobile" placeholder="Mobile Number" maxlength="10" required>
     <p id="mobile_error" style="color:red;"></p>
-
 
     <input type="email" name="email" id="email" placeholder="Email Address" required>
     <p id="email_error" style="color:red;"></p>
+
+    <label for="password">Password (min 8 characters):</label>
+    <input type="password" name="password" id="password" placeholder="Enter Password" minlength="8" required>
+
+    <label for="address">Address:</label>
+    <textarea name="address" id="address" placeholder="Enter your address" rows="3"></textarea>
     
     <button type="submit">Register</button>
 </form>

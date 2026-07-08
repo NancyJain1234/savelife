@@ -9,10 +9,14 @@
         {% for donor in results %}
             <li style="margin-bottom: 15px; line-height: 1.6;">
                 <strong>Name:</strong> {{ donor['name'] }} <br>
-                <strong>Blood Group:</strong> {{ donor['blood_group'] }} <br>
+                <strong>Blood Group:</strong> <span style="color: #cc0000; font-weight: bold;">{{ donor['blood_group'] }}</span>
+                {% if donor['blood_group'] == 'O-' %}
+                  <span style="background: #cc0000; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 12px;">Universal Donor</span>
+                {% endif %}
+                <br>
                 <strong>City:</strong> {{ donor['city'].capitalize() }} <br>
                 <strong>State:</strong> {{ donor['state'].capitalize() }} <br>
-                <strong>Contact Number:</strong> {{ donor['mobile'] }} <br>
+                <strong>Contact Number:</strong> {{ donor.get('phone', donor.get('mobile', 'N/A')) }} <br>
 
             </li>
         {% endfor %}
@@ -46,6 +50,7 @@
 {% endif %}
 
 <form method="POST" class="form-container">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
     <div class="form-group">
         <label for="your_name">Your Name:</label>
         <input type="text" id="your_name" name="your_name" placeholder="Your Name" required>
