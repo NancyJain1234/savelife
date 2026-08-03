@@ -16,10 +16,6 @@
                 <br>
                 <strong>City:</strong> {{ donor['city'].capitalize() }} <br>
                 <strong>State:</strong> {{ donor['state'].capitalize() }} <br>
-                <strong>Contact Number:</strong> {{ donor.get('phone', donor.get('mobile', 'N/A')) }} <br>
-
-            </li>
-        {% endfor %}
     </ul>
 
     <!-- Pagination -->

@@ -1,8 +1,11 @@
 import os
 import re
 import secrets as crypto_secrets
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from urllib.parse import quote_plus
+
+from bson import ObjectId as BsonObjectId
+
 
 import bcrypt
 import certifi
@@ -216,11 +219,13 @@ def check_password(password, hashed):
 # =======================
 # Helpers
 # =======================
+
 # --------------------------------
 # Blood Compatibility Matrix (RBC Donation)
 # --------------------------------
 # Maps recipient blood group → list of donor blood groups that can donate to them
 BLOOD_COMPATIBILITY = {
+
     "O-":  ["O-"],
     "O+":  ["O-", "O+"],
     "A-":  ["O-", "A-"],
@@ -240,21 +245,51 @@ def get_compatible_donor_groups(recipient_blood_group):
     return BLOOD_COMPATIBILITY.get(recipient_blood_group, [recipient_blood_group])
 
 
+DONOR_STATUS_AVAILABLE = "AVAILABLE"
+DONOR_STATUS_TEMP_UNAVAILABLE = "TEMPORARILY_UNAVAILABLE"
+DONOR_STATUS_MANUALLY_DISABLED = "MANUALLY_DISABLED"
+
+
+def infer_donor_status(doc):
+    """Backward-compatible status inference for existing users/donors."""
+    if not doc:
+        return DONOR_STATUS_AVAILABLE
+
+    status = doc.get("status")
+    if status:
+        return status
+
+    # Legacy boolean flag fallback
+    if doc.get("is_disabled", False):
+        return DONOR_STATUS_MANUALLY_DISABLED
+    return DONOR_STATUS_AVAILABLE
+
+
 def find_donors(blood_group, city, state):
     """Return donors with compatible blood groups for the given recipient.
-    Uses $in to match all compatible donor blood groups.
-    Escapes regex to prevent NoSQL injection."""
+
+    Only AVAILABLE donors are returned.
+    Also supports legacy data where `status` might not exist yet.
+    """
     if donors_col is None:
         return []
     compatible_groups = get_compatible_donor_groups(blood_group)
+
+    # AVAILABLE donors OR legacy donors that are not disabled
     query = {
         "blood_group": {"$in": compatible_groups},
         "city": {"$regex": f"^{re.escape(city)}$", "$options": "i"},
         "state": {"$regex": f"^{re.escape(state)}$", "$options": "i"},
-        "is_disabled": {"$ne": True},
+        "$or": [
+            {"status": DONOR_STATUS_AVAILABLE},
+            {"status": {"$exists": False}, "is_disabled": {"$ne": True}},
+            {"status": None, "is_disabled": {"$ne": True}},
+        ],
     }
+
     donors = list(donors_col.find(query, {"_id": 0, "email": 1, "name": 1}))
     return donors
+
 
 
 # =======================
@@ -577,6 +612,7 @@ def logout():
 
 
 @app.route("/health")
+@limiter.exempt
 def health():
     return {"status": "ok"}, 200
 
@@ -723,14 +759,28 @@ def enable_profile():
 @app.route("/disable_profile", methods=["POST"])
 @login_required
 def disable_profile():
+    # Legacy endpoint. Now treated as a manual disable to match new status system.
     if not validate_csrf():
         return redirect(url_for("profile"))
+
+    now = datetime.now(timezone.utc)
     users_col.update_one(
         {"_id": ObjectId(current_user.id)},
-        {"$set": {"is_donor": False}},
+        {
+            "$set": {
+                "is_donor": False,
+                "status": DONOR_STATUS_MANUALLY_DISABLED,
+                "disabledAt": now,
+                "disabledUntil": None,
+                "lastStatusChange": now,
+                "lastReminderSent": None,
+            }
+        },
     )
     flash("Your profile has been disabled.", "info")
     return redirect(url_for("profile"))
+
+
 
 
 # ----------------- SEND REQUEST -----------------
@@ -826,3 +876,4 @@ if __name__ == "__main__":
     debug_mode = os.environ.get("FLASK_DEBUG", "False").lower() == "true"
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=debug_mode)
+    
