@@ -392,9 +392,9 @@ def register():
         send_email(subject, [email], body)
 
         flash("✅ Registration successful!", "success")
-        return redirect(url_for("login"))
+        return redirect(url_for("home"))
 
-    return render_template("register.html")
+    return render_template(url_for("home"))
 
 
 @app.route("/request_blood", methods=["GET", "POST"])
