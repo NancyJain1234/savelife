@@ -394,7 +394,7 @@ def register():
         flash("✅ Registration successful!", "success")
         return redirect(url_for("home"))
 
-    return render_template(url_for("home"))
+    return render_template("register.html")
 
 
 @app.route("/request_blood", methods=["GET", "POST"])
