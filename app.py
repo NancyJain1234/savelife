@@ -537,7 +537,7 @@ def find():
 
 
 @app.route("/signup", methods=["GET", "POST"])
-@limiter.limit("5 per hour")
+@limiter.limit("10 per hour")
 def signup():
     if request.method == "POST":
         if not validate_csrf():
