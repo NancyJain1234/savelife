@@ -5,27 +5,45 @@
 
 {% if results %}
     <h3>Matching Donors:</h3>
+
     <ul style="background-color: #fff0f0; padding: 15px 20px; border-radius: 8px; list-style-type: none;">
         {% for donor in results %}
             <li style="margin-bottom: 15px; line-height: 1.6;">
                 <strong>Name:</strong> {{ donor['name'] }} <br>
-                <strong>Blood Group:</strong> <span style="color: #cc0000; font-weight: bold;">{{ donor['blood_group'] }}</span>
+
+                <strong>Blood Group:</strong>
+                <span style="color: #cc0000; font-weight: bold;">
+                    {{ donor['blood_group'] }}
+                </span>
+
                 {% if donor['blood_group'] == 'O-' %}
-                  <span style="background: #cc0000; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 12px;">Universal Donor</span>
+                    <span style="background:#cc0000;color:#fff;padding:2px 6px;border-radius:4px;font-size:12px;">
+                        Universal Donor
+                    </span>
                 {% endif %}
+
                 <br>
+
                 <strong>City:</strong> {{ donor['city'].capitalize() }} <br>
-                <strong>State:</strong> {{ donor['state'].capitalize() }} <br>
+                <strong>State:</strong> {{ donor['state'].capitalize() }}
+            </li>
+        {% endfor %}
     </ul>
 
     <!-- Pagination -->
-    <div style="margin-top: 20px;">
+    <div style="margin-top:20px;">
         {% if page > 1 %}
-            <a href="{{ url_for('find', page=page-1, blood_group=selected_blood_group, city=selected_city, state=selected_state) }}" style="margin-right: 10px;">⬅ Previous</a>
+            <a href="{{ url_for('find', page=page-1, blood_group=selected_blood_group, city=selected_city, state=selected_state) }}">
+                ⬅ Previous
+            </a>
         {% endif %}
+
         Page {{ page }} of {{ total_pages }}
+
         {% if page < total_pages %}
-            <a href="{{ url_for('find', page=page+1, blood_group=selected_blood_group, city=selected_city, state=selected_state) }}" style="margin-left: 10px;">Next ➡</a>
+            <a href="{{ url_for('find', page=page+1, blood_group=selected_blood_group, city=selected_city, state=selected_state) }}">
+                Next ➡
+            </a>
         {% endif %}
     </div>
 
